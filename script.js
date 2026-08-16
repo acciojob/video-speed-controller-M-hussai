@@ -1,41 +1,53 @@
-// Get Elements
+// Select Elements
 const player = document.querySelector('.player');
-const video = player.querySelector('.viewer');
+const video = player.querySelector('.player__video');
 const progress = player.querySelector('.progress');
 const progressBar = player.querySelector('.progress__filled');
-const toggle = player.querySelector('.toggle');
+const toggle = player.querySelector('.player__button.toggle');
 const volumeInput = player.querySelector('.volume');
 const speedInput = player.querySelector('.playbackSpeed');
 const skipButtons = player.querySelectorAll('[data-skip]');
 
-// Logic Functions
+// Toggle Play/Pause
 function togglePlay() {
-  const method = video.paused ? 'play' : 'pause';
-  video[method]();
+  if (video.paused) {
+    video.play();
+  } else {
+    video.pause();
+  }
 }
 
+// Update Play/Pause Button Text
 function updateButton() {
   const icon = video.paused ? '►' : '❚ ❚';
   toggle.textContent = icon;
 }
 
-function handleVolumeChange() {
-  video.volume = this.value;
-}
-
-function handleSpeedChange() {
-  video.playbackRate = this.value;
-}
-
-function skip() {
-  video.currentTime += parseFloat(this.dataset.skip);
-}
-
+// Update Progress Bar
 function handleProgress() {
+  if (!video.duration) return;
   const percent = (video.currentTime / video.duration) * 100;
   progressBar.style.flexBasis = `${percent}%`;
+  progressBar.style.width = `${percent}%`;
 }
 
+// Control Volume
+function handleVolumeChange(e) {
+  video.volume = e.target.value;
+}
+
+// Control Playback Rate
+function handleSpeedChange(e) {
+  video.playbackRate = e.target.value;
+}
+
+// Skip Forward / Rewind
+function skip(e) {
+  const skipTime = parseFloat(e.currentTarget.dataset.skip);
+  video.currentTime += skipTime;
+}
+
+// Drag / Click to Scrub Timeline
 function scrub(e) {
   const scrubTime = (e.offsetX / progress.offsetWidth) * video.duration;
   video.currentTime = scrubTime;
@@ -49,11 +61,11 @@ video.addEventListener('timeupdate', handleProgress);
 
 toggle.addEventListener('click', togglePlay);
 
+volumeInput.addEventListener('input', handleVolumeChange);
 volumeInput.addEventListener('change', handleVolumeChange);
-volumeInput.addEventListener('mousemove', handleVolumeChange);
 
+speedInput.addEventListener('input', handleSpeedChange);
 speedInput.addEventListener('change', handleSpeedChange);
-speedInput.addEventListener('mousemove', handleSpeedChange);
 
 skipButtons.forEach(button => button.addEventListener('click', skip));
 
